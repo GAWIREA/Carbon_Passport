@@ -2,16 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use App\Enums\UserRole;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class TestUsersSeeder extends Seeder
 {
     public function run()
     {
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             User::firstOrCreate(
                 ['email' => "testuser{$i}@example.com"],
                 [
@@ -22,7 +22,7 @@ class TestUsersSeeder extends Seeder
                     'monthly_points' => 0,
                     'coins' => 0,
                     'xp' => 0,
-                    'level' => 1
+                    'level' => 1,
                 ]
             );
         }
