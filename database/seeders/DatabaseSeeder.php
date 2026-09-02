@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\CarbonLog;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -41,26 +44,26 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Seed 50 Carbon Logs for User
-        \App\Models\CarbonLog::factory(50)->create(['user_id' => $user->id]);
+        CarbonLog::factory(50)->create(['user_id' => $user->id]);
 
         // Seed Missions (static + factory)
         $this->call(MissionSeeder::class);
-        $missions = \App\Models\Mission::factory(20)->create();
+        // $missions = \App\Models\Mission::factory(20)->create();
 
-        // Seed User Missions (attach 50 user missions randomly)
-        foreach (range(1, 50) as $i) {
-            \App\Models\UserMission::factory()->create([
-                'user_id' => $user->id,
-                'mission_id' => $missions->random()->id,
-            ]);
-        }
+        // // Seed User Missions (attach 50 user missions randomly)
+        // foreach (range(1, 50) as $i) {
+        //     \App\Models\UserMission::factory()->create([
+        //         'user_id' => $user->id,
+        //         'mission_id' => $missions->random()->id,
+        //     ]);
+        // }
 
         // Seed Products for Seller (with coin_price)
-        $products = \App\Models\Product::factory(50)->create(['seller_id' => $seller->id]);
+        $products = Product::factory(50)->create(['seller_id' => $seller->id]);
 
         // Seed Orders for Seller and User
         foreach (range(1, 50) as $i) {
-            \App\Models\Order::factory()->create([
+            Order::factory()->create([
                 'user_id' => $user->id,
                 'seller_id' => $seller->id,
                 'product_id' => $products->random()->id,
