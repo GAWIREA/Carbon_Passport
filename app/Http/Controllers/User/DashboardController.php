@@ -214,29 +214,35 @@ class DashboardController extends Controller
             ->get();
 
         $startOfWeek = now()->startOfWeek();
+        $startOfDay = now()->startOfDay();
 
         $weeklyMissions = [];
+        $dailyMissions = [];
+
         foreach ($userMissions as $um) {
-            // Reset mingguan jika started_at sebelum senin minggu ini
+            $m = $um->mission;
+            if (!$m) continue;
+
             $startedAt = \Carbon\Carbon::parse($um->started_at);
-            if ($startedAt->isBefore($startOfWeek)) {
+
+            // Reset logic based on mission type
+            if ($m->type === 'weekly' && $startedAt->isBefore($startOfWeek)) {
+                $um->current_progress = 0;
+                $um->status = 'active';
+                $um->started_at = now();
+                $um->save();
+            } elseif ($m->type === 'daily' && $startedAt->isBefore($startOfDay)) {
                 $um->current_progress = 0;
                 $um->status = 'active';
                 $um->started_at = now();
                 $um->save();
             }
 
-            $m = $um->mission;
             $icon = '🎯';
-            if ($m->activity_type === 'sepeda') {
-                $icon = '🚲';
-            }
-            if ($m->activity_type === 'botol') {
-                $icon = '💧';
-            }
-            if ($m->activity_type === 'krl') {
-                $icon = '🚆';
-            }
+            if ($m->activity_type === 'sepeda') $icon = '🚲';
+            elseif ($m->activity_type === 'listrik_plts') $icon = '💡';
+            elseif ($m->activity_type === 'makanan_nabati') $icon = '🥗';
+            // ... add more if needed
 
             $activityLabel = $m->category;
             foreach (\App\Data\ActivityCatalog::forJs() as $cat => $acts) {
@@ -246,14 +252,18 @@ class DashboardController extends Controller
                 }
             }
 
-            $weeklyMissions[] = [
+            $missionData = [
                 'id' => $um->id,
                 'icon' => $icon,
+                'bg' => 'var(--secondary-light)', // For daily view
                 'title' => $m->title,
-                'category' => $m->category,
+                'cat' => $m->category, // For daily view
+                'category' => $m->category, // For weekly view
                 'activity_label' => $activityLabel,
-                'type' => $m->activity_type,
-                'progress' => $um->current_progress,
+                'impact' => 'Sesuai aktivitas', // For daily view
+                'type' => $m->activity_type, // (weekly expects type to be activity_type)
+                'progress' => $um->current_progress, // for weekly
+                'done' => $um->current_progress, // for daily
                 'target' => $m->target_amount,
                 'reward_points' => $m->reward_points,
                 'reward_coins' => $m->reward_coins ?? 0,
@@ -261,14 +271,23 @@ class DashboardController extends Controller
                 'color' => '#5B8FFF',
                 'status' => $um->status,
             ];
+
+            if ($m->type === 'weekly') {
+                $weeklyMissions[] = $missionData;
+            } else {
+                $dailyMissions[] = $missionData;
+            }
         }
 
-        $weeklyMissions = collect($weeklyMissions)->sortBy(function($m) {
+        $sorter = function($m) {
             $status = $m['status'] ?? 'active';
             if ($status === 'claimed') return 2;
             if ($status === 'done') return 1;
             return 0;
-        })->values()->all();
+        };
+
+        $weeklyMissions = collect($weeklyMissions)->sortBy($sorter)->values()->all();
+        $dailyMissions = collect($dailyMissions)->sortBy($sorter)->values()->all();
 
         // Heatmap: Current Month Calendar
         $currentMonthStart = now()->startOfMonth();
@@ -313,68 +332,7 @@ class DashboardController extends Controller
             $heatmap[] = ['level' => -1, 'day' => '', 'is_future' => false];
         }
 
-        // Daily Missions
-        $dailyMissionsRaw = [
-            [
-                'type' => 'action', 'cat' => 'Transportasi', 'icon' => '🚲', 'bg' => 'var(--secondary-light)',
-                'title' => 'Catat 1 Aktivitas Transportasi', 'sub' => 'Lacak jejak karbon transportasi hari ini',
-                'impact' => 'Sesuai aktivitas', 'reward_points' => 15, 'reward_coins' => 10,
-                'target' => 1,
-            ],
-            [
-                'type' => 'action', 'cat' => 'Makanan', 'icon' => '🥗', 'bg' => 'var(--secondary-light)',
-                'title' => 'Catat 1 Aktivitas Makanan', 'sub' => 'Lacak jejak karbon makanan hari ini',
-                'impact' => 'Sesuai aktivitas', 'reward_points' => 15, 'reward_coins' => 10,
-                'target' => 1,
-            ],
-            [
-                'type' => 'action', 'cat' => 'Energi', 'icon' => '💡', 'bg' => 'var(--secondary-light)',
-                'title' => 'Catat 1 Aktivitas Energi', 'sub' => 'Lacak jejak karbon energi hari ini',
-                'impact' => 'Sesuai aktivitas', 'reward_points' => 15, 'reward_coins' => 10,
-                'target' => 1,
-            ],
-        ];
-
-        foreach ($dailyMissionsRaw as $rec) {
-            $existing = \App\Models\UserDailyMission::where('user_id', $user->id)
-                ->where('title', $rec['title'])
-                ->whereDate('created_at', now()->toDateString())
-                ->first();
-            
-            if (!$existing) {
-                \App\Models\UserDailyMission::create([
-                    'user_id' => $user->id,
-                    'title' => $rec['title'],
-                    'target' => $rec['target'],
-                    'progress' => 0,
-                    'status' => 'active'
-                ]);
-            }
-        }
-
-        $userDaily = \App\Models\UserDailyMission::where('user_id', $user->id)
-            ->whereDate('created_at', now()->toDateString())
-            ->get()->keyBy('title');
-
-        $dailyMissions = [];
-        foreach ($dailyMissionsRaw as $rec) {
-            $title = $rec['title'];
-            if (isset($userDaily[$title])) {
-                $rec['done'] = $userDaily[$title]->progress;
-                $rec['status'] = $userDaily[$title]->status;
-            } else {
-                $rec['done'] = 0;
-                $rec['status'] = 'active';
-            }
-            $dailyMissions[] = $rec;
-        }
-
-        $dailyMissions = collect($dailyMissions)->sortBy(function($m) {
-            $status = $m['status'] ?? 'active';
-            if ($status === 'claimed') return 2;
-            if ($status === 'done') return 1;
-            return 0;
-        })->values()->all();
+        // Product Recommendations
 
         // Product Recommendations
         $productRecs = [

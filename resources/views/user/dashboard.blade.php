@@ -361,7 +361,7 @@
                             <div class="mission-title">{{ $m['title'] }}</div>
                             <div class="mission-meta">
                                 <span class="mission-tag"
-                                    style="background:{{ $m['color'] }}18;color:{{ $m['color'] }};">{{ $m['activity_label'] ?? $m['category'] }}</span>
+                                    style="background:{{ $m['color'] }}18;color:{{ $m['color'] }};">{{ ucwords(str_replace('_', ' ', $m['category'])) }}</span>
                                 @if ($m['status'] === 'done')
                                     <form action="{{ route('user.weekly-mission.claim', $m['id']) }}" method="POST"
                                         style="margin:0;display:inline;" onsubmit="return confirm('Klaim reward untuk misi mingguan ini?');">
@@ -438,15 +438,12 @@
                             <div class="mission-title">{{ $r['title'] }}</div>
                             <div class="mission-meta">
                                 <span class="mission-tag"
-                                    style="background:#eee;color:var(--text-main);">{{ $r['cat'] }}</span>
+                                    style="background:#eee;color:var(--text-main);">{{ ucwords(str_replace('_', ' ', $r['cat'])) }}</span>
                                 <span style="font-size:11px;color:var(--text-main);">🌿 {{ $r['impact'] }}</span>
                                 @if (($r['status'] ?? '') === 'done')
-                                    <form action="{{ route('user.daily-mission.claim') }}" method="POST"
+                                    <form action="{{ route('user.weekly-mission.claim', $r['id']) }}" method="POST"
                                         style="margin:0;display:inline;" onsubmit="return confirm('Klaim reward untuk misi harian ini?');">
                                         @csrf
-                                        <input type="hidden" name="title" value="{{ $r['title'] }}">
-                                        <input type="hidden" name="reward_points" value="{{ $r['reward_points'] }}">
-                                        <input type="hidden" name="reward_coins" value="{{ $r['reward_coins'] }}">
                                         <button type="submit" class="btn btn-sm"
                                             style="background:#2ECC71;color:white;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;border:none;cursor:pointer;">Klaim
                                             Reward</button>
