@@ -11,7 +11,7 @@ class TestUsersSeeder extends Seeder
 {
     public function run()
     {
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 500; $i++) {
             User::firstOrCreate(
                 ['email' => "testuser{$i}@example.com"],
                 [
