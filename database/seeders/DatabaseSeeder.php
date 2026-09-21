@@ -48,16 +48,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed Missions (static + factory)
         $this->call(MissionSeeder::class);
-        // $missions = \App\Models\Mission::factory(20)->create();
-
-        // // Seed User Missions (attach 50 user missions randomly)
-        // foreach (range(1, 50) as $i) {
-        //     \App\Models\UserMission::factory()->create([
-        //         'user_id' => $user->id,
-        //         'mission_id' => $missions->random()->id,
-        //     ]);
-        // }
-
+    
         // Seed Products for Seller (with coin_price)
         $products = Product::factory(50)->create(['seller_id' => $seller->id]);
 

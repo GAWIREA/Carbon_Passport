@@ -1,7 +1,34 @@
 <header class="topbar">
+  <style>
+    .mobile-brand { display: none; font-weight: 800; font-size: 1.2rem; color: var(--primary); }
+    .mobile-stats { display: none; }
+    @media(max-width: 768px) {
+      .topbar { position: relative; }
+      .topbar-title { display: none; }
+      .mobile-brand { 
+        display: block; 
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+      }
+      .gamification-stats, .cart-icon, .bell { display: none !important; }
+      .user-chip > span { display: none; }
+      .mobile-stats { 
+        display: flex; 
+        justify-content: space-around; 
+        padding: 12px; 
+        background: #F8F9FA; 
+        border-bottom: 1px solid #eee;
+        margin: -8px -16px 8px -16px;
+      }
+    }
+  </style>
   <div style="display:flex; align-items:center; gap:12px;">
     <button class="menu-toggle" id="menuToggle">☰</button>
     <div class="topbar-title">@yield('page-title', 'Beranda')</div>
+    <div class="mobile-brand">Ecotrack</div>
   </div>
   <div class="topbar-right" style="display:flex; align-items:center; gap:16px;">
     <!-- Gamification Stats -->
@@ -36,16 +63,19 @@
         @endif
       </div>
       <div class="dropdown-menu" id="profileDropdownMenu">
+        <div class="mobile-stats">
+          <div title="Streak Api" style="display:flex; align-items:center; gap:4px; font-weight:bold; color:#FF5722; font-size:12px;">
+            🔥 <span>{{ auth()->check() ? (auth()->user()->current_streak ?? 0) : 0 }}</span>
+          </div>
+          <div title="Poin Leaderboard" style="display:flex; align-items:center; gap:4px; font-weight:bold; color:#3498DB; font-size:12px;">
+            🏆 <span>{{ auth()->check() ? number_format(auth()->user()->monthly_points ?? 0, 0, ',', '.') : 0 }}</span>
+          </div>
+          <div title="Koin Belanja" style="display:flex; align-items:center; gap:4px; font-weight:bold; color:#F5A623; font-size:12px;">
+            🪙 <span>{{ auth()->check() ? number_format(auth()->user()->coins ?? 0, 0, ',', '.') : 0 }}</span>
+          </div>
+        </div>
         <a href="{{ route('user.profile') }}" class="dropdown-item">👤 Profil</a>
         <a href="{{ route('user.settings') }}" class="dropdown-item">⚙️ Pengaturan</a>
-        <div class="dropdown-divider"></div>
-        <div class="dropdown-item" style="justify-content: space-between; cursor: default;" onclick="event.stopPropagation()">
-          <span>🌙 Dark Mode</span>
-          <label class="switch">
-            <input type="checkbox" id="themeToggleCheckbox">
-            <span class="slider round"></span>
-          </label>
-        </div>
         <div class="dropdown-divider"></div>
         <form action="{{ route('logout') }}" method="POST" style="margin:0;">
           @csrf
@@ -73,27 +103,6 @@
     document.addEventListener('click', (e) => {
       if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target)) {
         profileMenu.classList.remove('show');
-      }
-    });
-  }
-
-  // Dark/Light Mode toggle logic
-  const themeToggleCb = document.getElementById('themeToggleCheckbox');
-  const currentTheme = localStorage.getItem('theme') || 'light';
-  
-  if (currentTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    if (themeToggleCb) themeToggleCb.checked = true;
-  }
-
-  if (themeToggleCb) {
-    themeToggleCb.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
       }
     });
   }

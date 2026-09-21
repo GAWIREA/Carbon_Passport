@@ -79,7 +79,7 @@
 
     <form action="{{ route('user.tracking.store') }}" method="POST" id="trackingForm">
       @csrf
-      <div class="bento" style="grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:16px;">
+      <div class="bento-2" style="margin-bottom:16px;">
 
         {{-- Kategori --}}
         <div class="form-row">
@@ -132,7 +132,7 @@
         </div>
 
         {{-- Tanggal --}}
-        <div class="form-row" style="grid-column: span 2;">
+        <div class="form-row bento-c2">
           <label class="field-label">Tanggal</label>
           <input class="input" type="date" value="{{ date('Y-m-d') }}" readonly style="background:var(--bg); color:var(--text-light); cursor:not-allowed; max-width:200px;">
         </div>
@@ -144,7 +144,7 @@
         <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-light); margin-bottom:12px;">
           Prediksi Dampak
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="bento-2" style="gap:12px;">
 
           {{-- CO₂ --}}
           <div id="preview-co2-card" style="border-radius:10px; padding:14px; text-align:center; background:var(--card-bg);">

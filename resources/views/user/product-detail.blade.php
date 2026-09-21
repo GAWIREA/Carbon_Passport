@@ -48,13 +48,13 @@
             {{ $product['description'] }}
         </p>
 
-        <div style="margin-top: auto; display: flex; gap: 16px;">
-            <button class="btn btn-outline" style="flex: 1; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        <div style="margin-top: auto; display: flex; flex-wrap: wrap; gap: 16px;">
+            <button class="btn btn-outline" style="flex: 1; min-width: 150px; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;">
                 🛒 Masukkan Keranjang
             </button>
-            <form action="{{ route('user.marketplace.buy', $product['id']) }}" method="POST" style="flex: 1; display:flex;">
+            <form action="{{ route('user.marketplace.buy', $product['id']) }}" method="POST" style="flex: 1; min-width: 150px; display:flex;">
                 @csrf
-                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; {{ $product['stock'] <= 0 ? 'opacity: 0.5; cursor: not-allowed;' : '' }}" {{ $product['stock'] <= 0 ? 'disabled' : '' }}>
+                <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 150px; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; {{ $product['stock'] <= 0 ? 'opacity: 0.5; cursor: not-allowed;' : '' }}" {{ $product['stock'] <= 0 ? 'disabled' : '' }}>
                     🪙 Beli Sekarang
                 </button>
             </form>

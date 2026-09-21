@@ -61,7 +61,14 @@
 {{-- Tabel Riwayat dengan Filter Kategori --}}
 <div class="card">
   {{-- Filter Tabs --}}
-  <div class="filter-tabs" style="flex-wrap:wrap; gap:6px; margin-bottom:16px;">
+  <style>
+    .filter-tabs { display: flex; flex-wrap: nowrap !important; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+    .filter-tabs::-webkit-scrollbar { height: 4px; }
+    .filter-tabs::-webkit-scrollbar-track { background: transparent; }
+    .filter-tabs::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 4px; }
+    .filter-tab { flex-shrink: 0; }
+  </style>
+  <div class="filter-tabs" style="gap:6px; margin-bottom:16px;">
     <button class="filter-tab active" data-cat="all" id="filter-all">Semua</button>
     @foreach($categoryMeta as $key => $meta)
       <button class="filter-tab" data-cat="{{ $key }}">{{ $meta['icon'] }} {{ $meta['label'] }}</button>

@@ -297,8 +297,8 @@
                         @else
                             <div class="lb-avatar">{{ $u['emoji'] }}</div>
                         @endif
-                        <div class="lb-name">{{ $u['name'] }}</div>
-                        <div class="lb-pts">{{ number_format($u['pts'], 0, ',', '.') }} <span
+                        <div class="lb-name" style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $u['name'] }}</div>
+                        <div class="lb-pts" style="flex-shrink: 0;">{{ number_format($u['pts'], 0, ',', '.') }} <span
                                 style="font-size:10.5px; font-weight:600; opacity:0.7;">Poin</span></div>
                     </div>
                 @endforeach
@@ -309,28 +309,7 @@
 
     </div>
 
-    <style>
-        .bento-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-top: 18px;
-        }
-
-        @media(max-width: 1100px) {
-            .bento-3 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media(max-width: 640px) {
-            .bento-3 {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-
-    <div class="bento-3">
+    <div class="bento-3" style="margin-top: 18px;">
 
         {{-- ===== MISI MINGGUAN ===== --}}
         <div class="card" style="display:flex; flex-direction:column;">

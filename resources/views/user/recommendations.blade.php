@@ -12,9 +12,29 @@
   <p>Kumpulkan poin dan koin dengan menyelesaikan misi mingguan dan rekomendasi harian, lalu tukarkan koinmu dengan berbagai produk menarik.</p>
 </div>
 
+<style>
+  @media(max-width: 640px) {
+    .mission-header { flex-direction: column !important; align-items: stretch !important; }
+    .mission-cta { align-items: stretch !important; margin-top: 12px; }
+    .mission-cta-rewards { align-items: flex-start !important; flex-direction: row !important; flex-wrap: wrap; }
+    .mission-cta-btn { width: 100% !important; display: block !important; text-align: center !important; }
+    
+    .product-card { flex-direction: column !important; align-items: stretch !important; text-align: center; }
+    .product-icon { margin: 0 auto; }
+    .product-cta { width: 100% !important; border-left: none !important; border-top: 1px dashed #E0E0E0; padding-left: 0 !important; padding-top: 16px; margin-top: 16px; }
+  }
+
+  /* Scrollable filter tabs */
+  .filter-tabs { display: flex; flex-wrap: nowrap !important; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+  .filter-tabs::-webkit-scrollbar { height: 4px; }
+  .filter-tabs::-webkit-scrollbar-track { background: transparent; }
+  .filter-tabs::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 4px; }
+  .filter-tab { flex-shrink: 0; white-space: nowrap; }
+</style>
+
 <div class="card" style="margin-bottom:18px; padding: 16px 24px;">
   <div style="display: flex; align-items: center; gap: 16px;">
-    <div style="font-size: 14px; font-weight: 600; color: var(--text-dark);">Filter Kategori:</div>
+    <div style="font-size: 14px; font-weight: 600; color: var(--text-dark); flex-shrink: 0;">Filter Kategori:</div>
     <div class="filter-tabs" style="margin: 0; padding: 0;">
       <button class="filter-tab cat-tab active" data-cat="all">Semua</button>
       <button class="filter-tab cat-tab" data-cat="weekly">⭐ Misi Mingguan</button>
@@ -26,22 +46,20 @@
 
 <!-- Section: Misi Mingguan -->
 <div class="card" style="margin-bottom:24px; padding: 24px; background: linear-gradient(to right, #FFF, #FAFAFF); border: 1px solid var(--border);">
-  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-    <div>
-        <h2 style="margin-top:0; margin-bottom: 4px; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
-            ⭐ Misi Mingguan
-        </h2>
-        <span style="font-size: 12px; font-weight: normal; color: var(--text-light);">Selesaikan sebelum batas waktu habis! Progress akan otomatis bertambah saat kamu mencatat emisi.</span>
-    </div>
-    <span class="badge badge-blue" style="font-size: 12px; padding: 4px 10px;">{{ collect($weeklyMissions)->where('status','done')->count() }} / {{ count($weeklyMissions) }} Selesai</span>
+  <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
+    <h2 style="margin-top:0; margin-bottom: 4px; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        ⭐ Misi Mingguan
+    </h2>
+    <span style="font-size: 12px; font-weight: normal; color: var(--text-light); margin-bottom: 12px;">Selesaikan sebelum batas waktu habis! Progress akan otomatis bertambah saat kamu mencatat emisi.</span>
+    <span class="badge badge-blue" style="font-size: 12px; padding: 4px 12px; border-radius: 12px;">{{ collect($weeklyMissions)->whereIn('status', ['done', 'claimed'])->count() }} / {{ count($weeklyMissions) }} Selesai</span>
   </div>
   
   <div class="recList section-list" data-expanded="false" style="display: flex; flex-direction: column; gap: 12px;">
     @foreach($weeklyMissions as $m)
       @php $pct = min(100, round($m['progress'] / $m['target'] * 100)); @endphp
       <div class="rec-card" data-cat="weekly" style="display: flex; flex-direction: column; padding: 16px; border: 1px solid {{ $m['status'] === 'done' ? 'rgba(46,204,113,0.3)' : 'var(--border)' }}; border-radius: 12px; background: {{ $m['status'] === 'claimed' ? '#F5F5F5' : ($m['status'] === 'done' ? 'rgba(46,204,113,0.02)' : '#FFF') }}; box-shadow: 0 1px 3px rgba(0,0,0,0.02); opacity: {{ $m['status'] === 'claimed' ? '0.6' : '1' }};">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <div style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;">
+        <div class="mission-header" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px; display: flex; align-items: center; gap: 12px;">
             <div style="width: 44px; height: 44px; border-radius: 10px; background: {{ $m['color'] }}22; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
               {{ $m['icon'] }}
             </div>
@@ -59,20 +77,20 @@
               </div>
             </div>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
-              <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; margin-bottom:8px;">
+          <div class="mission-cta" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+              <div class="mission-cta-rewards" style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; margin-bottom:8px;">
                 <span style="background:rgba(91,143,255,0.15); color:var(--primary); padding:4px 8px; border-radius:8px; font-size:12px; font-weight:700; display:inline-block;">✨ +{{ $m['reward_points'] }} Poin</span>
                 <span style="background:rgba(245,166,35,0.15); color:#d88c14; padding:4px 8px; border-radius:8px; font-size:12px; font-weight:700; display:inline-block;">🪙 +{{ $m['reward_coins'] }} Koin</span>
               </div>
               @if($m['status'] === 'done')
-                <form action="{{ route('user.weekly-mission.claim', $m['id']) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Klaim reward untuk misi mingguan ini?');">
+                <form action="{{ route('user.weekly-mission.claim', $m['id']) }}" method="POST" style="margin: 0; width: 100%;" onsubmit="return confirm('Klaim reward untuk misi mingguan ini?');">
                   @csrf
-                  <button type="submit" class="btn btn-sm" style="background:#2ECC71;color:white;border-radius:20px;padding:4px 14px;font-size:11.5px;font-weight:600;border:none;cursor:pointer;">Klaim Reward</button>
+                  <button type="submit" class="btn btn-sm mission-cta-btn" style="background:#2ECC71;color:white;border-radius:20px;padding:4px 14px;font-size:11.5px;font-weight:600;border:none;cursor:pointer;">Klaim Reward</button>
                 </form>
               @elseif($m['status'] === 'claimed')
                 <span style="font-size: 11.5px; color: #2ECC71; font-weight: 600;">✓ Diklaim</span>
               @else
-                <a href="{{ route('user.tracking') }}" class="btn btn-outline btn-sm" style="padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 11.5px; text-decoration: none;">Catat Emisi</a>
+                <a href="{{ route('user.tracking') }}" class="btn btn-outline btn-sm mission-cta-btn" style="padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 11.5px; text-decoration: none;">Catat Emisi</a>
               @endif
           </div>
         </div>
@@ -95,19 +113,22 @@
 
 <!-- Section: Misi Harian -->
 <div class="card" style="margin-bottom:24px; padding: 24px;">
-  <h2 style="margin-top:0; margin-bottom: 16px; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
-      🎯 Rekomendasi Misi Harian
-      <span style="font-size: 12px; font-weight: normal; color: var(--text-light);">(Selesaikan misi untuk mendapatkan poin tambahan)</span>
-  </h2>
+  <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
+    <h2 style="margin-top:0; margin-bottom: 4px; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        🎯 Rekomendasi Misi Harian
+    </h2>
+    <span style="font-size: 12px; font-weight: normal; color: var(--text-light); margin-bottom: 12px;">(Selesaikan misi untuk mendapatkan poin tambahan)</span>
+    <span class="badge badge-blue" style="font-size: 12px; padding: 4px 12px; border-radius: 12px;">{{ collect($recommendations)->where('type','action')->whereIn('status', ['done', 'claimed'])->count() }} / {{ collect($recommendations)->where('type','action')->count() }} Selesai</span>
+  </div>
   
   <div class="recList section-list" data-expanded="false" style="display: flex; flex-direction: column; gap: 16px;">
     @foreach($recommendations as $i => $r)
       @if($r['type'] === 'action')
         @php $pct = round(($r['done']/($r['target'] ?? 1))*100); @endphp
         <div class="rec-card" data-cat="daily" style="display: flex; flex-direction: column; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: {{ (isset($r['status']) && $r['status'] === 'claimed') ? '#F5F5F5' : '#FFF' }}; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 0; opacity: {{ (isset($r['status']) && $r['status'] === 'claimed') ? '0.6' : '1' }};">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <div class="mission-header" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
             <!-- Kiri: Info Misi -->
-            <div style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;">
+            <div style="flex: 1; min-width: 200px; display: flex; align-items: center; gap: 12px;">
               <div style="width: 44px; height: 44px; border-radius: 10px; background: {{ $r['bg'] }}; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
                 {{ $r['icon'] }}
               </div>
@@ -123,23 +144,23 @@
             </div>
             
             <!-- Kanan: Reward & Tombol -->
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
-                <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; margin-bottom:8px;">
+            <div class="mission-cta" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+                <div class="mission-cta-rewards" style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; margin-bottom:8px;">
                   <span style="background:rgba(91,143,255,0.15); color:var(--primary); padding:4px 8px; border-radius:8px; font-size:12px; font-weight:700; display:inline-block;">✨ +{{ $r['reward_points'] }} Poin</span>
                   <span style="background:rgba(245,166,35,0.15); color:#d88c14; padding:4px 8px; border-radius:8px; font-size:12px; font-weight:700; display:inline-block;">🪙 +{{ $r['reward_coins'] }} Koin</span>
                 </div>
                 @if(isset($r['status']) && $r['status'] === 'done')
-                    <form action="{{ route('user.daily-mission.claim') }}" method="POST" style="display:inline; margin: 0;" onsubmit="return confirm('Klaim reward untuk misi harian ini?');">
+                    <form action="{{ route('user.daily-mission.claim') }}" method="POST" style="display:inline; margin: 0; width: 100%;" onsubmit="return confirm('Klaim reward untuk misi harian ini?');">
                         @csrf
                         <input type="hidden" name="title" value="{{ $r['title'] }}">
                         <input type="hidden" name="reward_points" value="{{ $r['reward_points'] }}">
                         <input type="hidden" name="reward_coins" value="{{ $r['reward_coins'] }}">
-                        <button type="submit" class="btn btn-sm" style="background:#2ECC71;color:white;border-radius:20px;padding:4px 14px;font-size:11.5px;font-weight:600;border:none;cursor:pointer;">Klaim Reward</button>
+                        <button type="submit" class="btn btn-sm mission-cta-btn" style="background:#2ECC71;color:white;border-radius:20px;padding:4px 14px;font-size:11.5px;font-weight:600;border:none;cursor:pointer;">Klaim Reward</button>
                     </form>
                 @elseif(isset($r['status']) && $r['status'] === 'claimed')
                     <span style="font-size: 11.5px; color: #2ECC71; font-weight: 600;">✓ Diklaim</span>
                 @else
-                    <a href="{{ route('user.tracking') }}" class="btn btn-outline btn-sm" style="padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 11.5px; text-decoration: none; border-color: var(--primary); color: var(--primary);">Catat Emisi</a>
+                    <a href="{{ route('user.tracking') }}" class="btn btn-outline btn-sm mission-cta-btn" style="padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 11.5px; text-decoration: none; border-color: var(--primary); color: var(--primary);">Catat Emisi</a>
                 @endif
             </div>
           </div>
@@ -172,14 +193,14 @@
   <div class="recList section-list" data-expanded="false" style="display: flex; flex-direction: column; gap: 16px;">
     @foreach($recommendations as $i => $r)
       @if($r['type'] === 'product')
-        <div class="rec-card" data-cat="product" style="display: flex; align-items: stretch; gap: 16px; padding: 16px; border: 1px solid var(--border); background: #FFF; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 16px; transition: transform 0.2s;">
+        <div class="rec-card product-card" data-cat="product" style="display: flex; align-items: stretch; gap: 16px; padding: 16px; border: 1px solid var(--border); background: #FFF; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 16px; transition: transform 0.2s; flex-wrap: wrap;">
           <!-- Left: Big Icon -->
-          <div style="width: 80px; flex-shrink: 0; background: {{ $r['bg'] }}; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 36px;">
+          <div class="product-icon" style="width: 80px; flex-shrink: 0; background: {{ $r['bg'] }}; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 36px;">
             {{ $r['icon'] }}
           </div>
 
           <!-- Middle: Content -->
-          <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+          <div style="flex-grow: 1; min-width: 150px; display: flex; flex-direction: column; justify-content: center;">
             <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--text-dark); line-height: 1.4;">{{ $r['title'] }}</h3>
             
             <div style="display:flex; align-items:center; gap:8px; margin-bottom: 8px;">
@@ -192,7 +213,7 @@
           </div>
 
           <!-- Right: CTA Section -->
-          <div style="width: 160px; flex-shrink: 0; border-left: 1px dashed #E0E0E0; padding-left: 16px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+          <div class="product-cta" style="width: 160px; flex-shrink: 0; border-left: 1px dashed #E0E0E0; padding-left: 16px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
             <div style="font-size: 20px; font-weight: 800; color: #F5A623; line-height: 1.2;">
               🪙 {{ $r['coin_price'] }} Koin
             </div>

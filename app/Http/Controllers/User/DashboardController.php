@@ -653,7 +653,7 @@ class DashboardController extends Controller
         $logs = \App\Models\CarbonLog::where('user_id', $user->id)
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate(25);
+            ->paginate(10);
 
         // Per-category CO₂ totals for the current month (emission side only)
         $monthStart = \Carbon\Carbon::now()->startOfMonth();
@@ -782,6 +782,8 @@ class DashboardController extends Controller
         $weeklyMissions = [];
         foreach ($userMissions as $um) {
             $m = $um->mission;
+            if ($m->type !== 'weekly') continue;
+            
             $icon = '🎯';
             if ($m->activity_type === 'sepeda') {
                 $icon = '🚲';

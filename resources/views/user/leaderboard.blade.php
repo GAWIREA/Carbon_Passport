@@ -18,11 +18,11 @@
       @else
         <div class="lb-avatar" style="width:36px;height:36px;font-size:17px;">{{ $u['emoji'] }}</div>
       @endif
-      <div>
-        <a href="{{ route('user.public.profile', $u['id']) }}" class="lb-name" style="font-size:14px; text-decoration: none; color: inherit;">
+      <div style="flex: 1; min-width: 0;">
+        <a href="{{ route('user.public.profile', $u['id']) }}" class="lb-name" style="font-size:14px; text-decoration: none; color: inherit; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           {{ $u['name'] }} {{ ($u['me'] ?? false) ? '(Kamu)' : '' }}
         </a>
-        <div style="font-size:11.5px; color:var(--text-light);">{{ $u['dept'] }}</div>
+        <div style="font-size:11.5px; color:var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $u['dept'] }}</div>
       </div>
       <div class="lb-pts" style="font-size:15px;">{{ number_format($u['pts'],0,',','.') }} <span style="font-size:11px; font-weight:normal; color:var(--text-light);">Poin</span></div>
     </div>
