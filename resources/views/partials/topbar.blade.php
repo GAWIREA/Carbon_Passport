@@ -49,7 +49,6 @@
     <!-- Keranjang Belanja -->
     <a href="{{ route('user.marketplace') }}" class="cart-icon" title="Keranjang" style="position:relative; text-decoration:none; color:inherit; font-size:1.2rem;">
       🛒
-      <span style="position:absolute; top:-6px; right:-8px; background:#E74C3C; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:10px;">2</span>
     </a>
 
     <div class="bell">🔔<span class="ping"></span></div>

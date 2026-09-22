@@ -26,8 +26,14 @@ class SyncUserStats
 
                 // Jika aktivitas terakhir lebih lama dari kemarin (berarti kemarin bolong)
                 if ($lastActivity->isBefore($yesterday) && $user->current_streak > 0) {
-                    $user->current_streak = 0;
-                    $user->save();
+                    if ($user->streak_freezes > 0) {
+                        $user->streak_freezes -= 1;
+                        $user->last_activity_date = $yesterday->toDateString();
+                        $user->save();
+                    } else {
+                        $user->current_streak = 0;
+                        $user->save();
+                    }
                 }
             }
         }

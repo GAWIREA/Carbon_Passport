@@ -56,6 +56,7 @@ Route::prefix('user')
 
         // Marketplace / Reward
         Route::get('/marketplace', [UserDashboard::class, 'marketplace'])->name('marketplace');
+        Route::get('/marketplace/orders', [UserDashboard::class, 'orders'])->name('orders');
         Route::get('/marketplace/{id}', [UserDashboard::class, 'productDetail'])->name('marketplace.detail');
         Route::post('/marketplace/{id}/buy', [UserDashboard::class, 'buyProduct'])->name('marketplace.buy');
     });

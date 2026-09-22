@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Achievement;
 use App\Models\CarbonLog;
 use App\Models\Mission;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use App\Models\UserDailyMission;
 use App\Models\UserMission;
@@ -657,6 +659,110 @@ class DashboardController extends Controller
         return redirect()->route('user.profile')->with('status', 'Lencana yang dipamerkan berhasil diperbarui!');
     }
 
+    public function marketplace(): View
+    {
+        $products = Product::orderBy('coin_price')->get();
+
+        $products->transform(function ($product) {
+            $icons = ['Layanan' => '💖', 'Transportasi' => '🚆', 'Makanan' => '🍱', 'Lifestyle' => '🌿'];
+            $product->image = $icons[$product->category] ?? '🎁';
+            if ($product->name === 'Streak Pemulihan') {
+                $product->image = '🔥';
+            }
+
+            return $product;
+        });
+
+        $groupedProducts = $products->groupBy('category');
+
+        return view('user.marketplace', compact('groupedProducts'));
+    }
+
+    public function productDetail($id): View
+    {
+        $product = Product::findOrFail($id);
+        $icons = ['Layanan' => '💖', 'Transportasi' => '🚆', 'Makanan' => '🍱', 'Lifestyle' => '🌿'];
+        $product->image = $icons[$product->category] ?? '🎁';
+        if ($product->name === 'Streak Pemulihan') {
+            $product->image = '🔥';
+        }
+
+        $user = Auth::user();
+
+        return view('user.product-detail', compact('product', 'user'));
+    }
+
+    public function buyProduct(Request $request, $id): RedirectResponse
+    {
+        $user = Auth::user();
+        $product = Product::findOrFail($id);
+        $method = $request->input('payment_method', 'coins');
+
+        if ($method === 'coins') {
+            if (($user->coins ?? 0) < $product->coin_price) {
+                return back()->with('error', 'Koin tidak mencukupi untuk membeli produk ini.');
+            }
+            $user->coins -= $product->coin_price;
+        } elseif ($method === 'idr') {
+            if ($product->idr_price <= 0) {
+                return back()->with('error', 'Produk ini tidak dapat dibeli dengan uang.');
+            }
+            // Simulasi pembayaran IDR sukses
+        }
+
+        if ($product->stock !== 999999) {
+            if ($product->stock <= 0) {
+                return back()->with('error', 'Stok produk habis.');
+            }
+            $product->decrement('stock');
+        }
+
+        Order::create([
+            'user_id' => $user->id,
+            'seller_id' => $product->seller_id,
+            'product_id' => $product->id,
+            'status' => 'completed',
+            'payment_method' => $method,
+            'total_points' => 0,
+            'total_coins' => $method === 'coins' ? $product->coin_price : 0,
+            'total_idr' => $method === 'idr' ? $product->idr_price : 0,
+        ]);
+
+        if ($product->name === 'Streak Pemulihan') {
+            $user->streak_freezes = ($user->streak_freezes ?? 0) + 1;
+            $user->save();
+            return redirect()->route('user.marketplace')->with('status', 'Berhasil membeli '.$product->name.'! Item ini akan melindungimu dari kehilangan streak saat kamu lupa login.');
+        }
+
+        if ($product->co2_reduction > 0) {
+            $user->total_co2_saved += $product->co2_reduction;
+            
+            \App\Models\CarbonLog::create([
+                'user_id' => $user->id,
+                'category' => 'Marketplace',
+                'activity_type' => 'Tukar: ' . $product->name,
+                'amount' => 1,
+                'unit' => 'item',
+                'co2_equivalent' => $product->co2_reduction,
+                'date' => now()->toDateString(),
+            ]);
+        }
+
+        $user->save();
+
+        return redirect()->route('user.marketplace')->with('status', 'Berhasil membeli '.$product->name.'!'. ($product->co2_reduction > 0 ? ' Kamu juga mengurangi '.$product->co2_reduction.' kg CO2!' : ''));
+    }
+
+    public function orders(): View
+    {
+        $orders = \App\Models\Order::with('product')
+            ->where('user_id', Auth::id())
+            ->orderByDesc('created_at')
+            ->paginate(15);
+
+        return view('user.orders', compact('orders'));
+    }
+
     public function settings(): View
     {
         return view('user.settings', ['user' => Auth::user()]);
@@ -929,107 +1035,6 @@ class DashboardController extends Controller
     public function completeTask(Request $request): RedirectResponse
     {
         return back()->with('status', 'Task selesai! Streak & poin diperbarui.');
-    }
-
-    public function marketplace(): View
-    {
-        // Mock data products (now with coin_price)
-        $products = [
-            ['id' => 1, 'name' => 'Voucher Commuter Line 50rb', 'category' => 'Transportasi', 'coin_price' => 500, 'type' => 'voucher', 'image' => '🚆'],
-            ['id' => 2, 'name' => 'Tumbler Stainless Steel', 'category' => 'Lifestyle', 'coin_price' => 750, 'type' => 'physical', 'image' => '🥤'],
-            ['id' => 3, 'name' => 'Voucher Diskon Sayurbox 20%', 'category' => 'Makanan', 'coin_price' => 300, 'type' => 'voucher', 'image' => '🥦'],
-            ['id' => 4, 'name' => 'Tas Belanja Ramah Lingkungan', 'category' => 'Lifestyle', 'coin_price' => 400, 'type' => 'physical', 'image' => '🛍️'],
-        ];
-
-        return view('user.marketplace', [
-            'user' => Auth::user(),
-            'products' => $products,
-        ]);
-    }
-
-    public function productDetail(int $id): View
-    {
-        // Mock data product detail (now with coin_price)
-        $products = [
-            1 => [
-                'id' => 1, 'name' => 'Voucher Commuter Line 50rb', 'category' => 'Transportasi',
-                'coin_price' => 500, 'type' => 'voucher', 'image' => '🚆', 'stock' => 15,
-                'description' => 'Tukarkan koinmu dengan voucher Commuter Line senilai Rp 50.000. Berlaku untuk semua rute KRL di Jabodetabek. Voucher akan dikirimkan ke email yang terdaftar.',
-            ],
-            2 => [
-                'id' => 2, 'name' => 'Tumbler Stainless Steel', 'category' => 'Lifestyle',
-                'coin_price' => 750, 'type' => 'physical', 'image' => '🥤', 'stock' => 5,
-                'description' => 'Kurangi penggunaan plastik sekali pakai dengan Tumbler Stainless Steel eksklusif dari Selaras. Tahan panas dan dingin hingga 12 jam.',
-            ],
-            3 => [
-                'id' => 3, 'name' => 'Voucher Diskon Sayurbox 20%', 'category' => 'Makanan',
-                'coin_price' => 300, 'type' => 'voucher', 'image' => '🥦', 'stock' => 50,
-                'description' => 'Dapatkan diskon 20% untuk pembelanjaan produk segar di Sayurbox. Dukung petani lokal dan kurangi jejak karbon panganmu.',
-            ],
-            4 => [
-                'id' => 4, 'name' => 'Tas Belanja Ramah Lingkungan', 'category' => 'Lifestyle',
-                'coin_price' => 400, 'type' => 'physical', 'image' => '🛍️', 'stock' => 10,
-                'description' => 'Tas belanja lipat yang kuat dan praktis dibawa kemana-mana. Alternatif terbaik untuk mengganti kantong plastik.',
-            ],
-            5 => [
-                'id' => 5, 'name' => 'Smart Plug Hemat Energi', 'category' => 'Energi & Listrik',
-                'coin_price' => 450, 'type' => 'physical', 'image' => '🔌', 'stock' => 20,
-                'description' => 'Smart Plug yang dapat membantu mengontrol perangkat dari HP untuk menghemat listrik.',
-            ],
-        ];
-
-        $product = $products[$id] ?? null;
-
-        if (! $product) {
-            abort(404, 'Produk tidak ditemukan');
-        }
-
-        return view('user.product-detail', [
-            'user' => Auth::user(),
-            'product' => $product,
-        ]);
-    }
-
-    public function buyProduct(int $id): RedirectResponse
-    {
-        $user = Auth::user();
-
-        // Mock data product detail (sync with productDetail method)
-        $products = [
-            1 => ['id' => 1, 'name' => 'Voucher Commuter Line 50rb', 'coin_price' => 500, 'stock' => 15],
-            2 => ['id' => 2, 'name' => 'Tumbler Stainless Steel', 'coin_price' => 750, 'stock' => 5],
-            3 => ['id' => 3, 'name' => 'Voucher Diskon Sayurbox 20%', 'coin_price' => 300, 'stock' => 50],
-            4 => ['id' => 4, 'name' => 'Tas Belanja Ramah Lingkungan', 'coin_price' => 400, 'stock' => 10],
-            5 => ['id' => 5, 'name' => 'Smart Plug Hemat Energi', 'coin_price' => 450, 'stock' => 20],
-        ];
-
-        $product = $products[$id] ?? null;
-
-        if (! $product) {
-            abort(404, 'Produk tidak ditemukan');
-        }
-
-        if ($product['stock'] <= 0) {
-            return back()->with('error', 'Stok produk habis.');
-        }
-
-        if (($user->coins ?? 0) < $product['coin_price']) {
-            return back()->with('error', 'Koin tidak cukup untuk membeli produk ini. Koin saat ini: '.($user->coins ?? 0));
-        }
-
-        // Deduct coins
-        $user->coins -= $product['coin_price'];
-
-        // Add Bonus XP (Bypassing daily cap)
-        $bonusXp = 150;
-        $user->xp += $bonusXp;
-        $user->save();
-
-        // Check for level up & achievements
-        app(LevelService::class)->checkLevelUp($user);
-        app(AchievementService::class)->checkAndUnlock($user);
-
-        return back()->with('success', 'Berhasil membeli '.$product['name'].'! Kamu mendapatkan bonus +'.$bonusXp.' XP.');
     }
 
     public function levelDetails(): View

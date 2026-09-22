@@ -26,7 +26,9 @@
         <div style="display: flex; gap: 8px; margin-bottom: 16px;">
             <span class="badge badge-grey">{{ $product['category'] }}</span>
             <span class="badge" style="background: #E8F5E9; color: #2E7D32;">{{ ucfirst($product['type']) }}</span>
-            @if($product['stock'] > 0)
+            @if($product['stock'] == 999999)
+                <span class="badge" style="background: #E3F2FD; color: #1565C0;">Stok Unlimited</span>
+            @elseif($product['stock'] > 0)
                 <span class="badge" style="background: #FFF3E0; color: #E65100;">Sisa {{ $product['stock'] }}</span>
             @else
                 <span class="badge" style="background: #FFEBEE; color: #C62828;">Stok Habis</span>
@@ -37,6 +39,10 @@
         
         <div style="font-size: 24px; font-weight: bold; color: #F5A623; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
             🪙 {{ number_format($product['coin_price'], 0, ',', '.') }} <span style="font-size: 14px; font-weight: normal; color: var(--text-light);">koin</span>
+            @if($product['idr_price'] > 0)
+                <span style="font-size: 18px; color: var(--text-light); margin: 0 8px;">/</span>
+                <span style="color: #2ECC71;">Rp {{ number_format($product['idr_price'], 0, ',', '.') }}</span>
+            @endif
         </div>
         
         <div style="font-size: 13px; font-weight: 600; color: #5B8FFF; background: #EEF1F5; padding: 6px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; width: fit-content; border-bottom: 1px solid #eee;">
@@ -48,16 +54,26 @@
             {{ $product['description'] }}
         </p>
 
-        <div style="margin-top: auto; display: flex; flex-wrap: wrap; gap: 16px;">
-            <button class="btn btn-outline" style="flex: 1; min-width: 150px; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                🛒 Masukkan Keranjang
-            </button>
-            <form action="{{ route('user.marketplace.buy', $product['id']) }}" method="POST" style="flex: 1; min-width: 150px; display:flex;">
-                @csrf
-                <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 150px; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; {{ $product['stock'] <= 0 ? 'opacity: 0.5; cursor: not-allowed;' : '' }}" {{ $product['stock'] <= 0 ? 'disabled' : '' }}>
-                    🪙 Beli Sekarang
-                </button>
-            </form>
+        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                <form action="{{ route('user.marketplace.buy', $product['id']) }}" method="POST" style="flex: 1; min-width: 150px; display:flex;">
+                    @csrf
+                    <input type="hidden" name="payment_method" value="coins">
+                    <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; {{ $product['stock'] <= 0 ? 'opacity: 0.5; cursor: not-allowed;' : '' }}" {{ $product['stock'] <= 0 ? 'disabled' : '' }}>
+                        🪙 Beli via Koin
+                    </button>
+                </form>
+
+                @if($product['idr_price'] > 0)
+                <form action="{{ route('user.marketplace.buy', $product['id']) }}" method="POST" style="flex: 1; min-width: 150px; display:flex;">
+                    @csrf
+                    <input type="hidden" name="payment_method" value="idr">
+                    <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; background: #2ECC71; border-color: #2ECC71; {{ $product['stock'] <= 0 ? 'opacity: 0.5; cursor: not-allowed;' : '' }}" {{ $product['stock'] <= 0 ? 'disabled' : '' }}>
+                        💳 Beli (Rp)
+                    </button>
+                </form>
+                @endif
+            </div>
         </div>
         
         @if($product['coin_price'] > ($user->coins ?? 0))
