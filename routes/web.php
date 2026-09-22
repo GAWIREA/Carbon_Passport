@@ -37,6 +37,7 @@ Route::prefix('user')
         Route::get('/profile', [UserDashboard::class, 'profile'])->name('profile');
         Route::get('/profile/edit', [UserDashboard::class, 'editProfile'])->name('profile.edit');
         Route::put('/profile/edit', [UserDashboard::class, 'updateProfile'])->name('profile.update');
+        Route::put('/profile/achievements', [UserDashboard::class, 'updateDisplayedAchievements'])->name('profile.achievements.update');
         Route::get('/friends/add', [SocialController::class, 'search'])->name('friends.add');
         Route::get('/u/{id}', [SocialController::class, 'publicProfile'])->name('public.profile');
         Route::post('/u/{id}/follow', [SocialController::class, 'toggleFollow'])->name('follow.toggle');
@@ -52,7 +53,7 @@ Route::prefix('user')
         Route::post('/daily-mission/claim', [UserDashboard::class, 'claimDailyMission'])->name('daily-mission.claim');
         Route::post('/weekly-mission/{id}/claim', [UserDashboard::class, 'claimWeeklyMission'])->name('weekly-mission.claim');
         Route::post('/complete-task', [UserDashboard::class, 'completeTask'])->name('complete-task');
-        
+
         // Marketplace / Reward
         Route::get('/marketplace', [UserDashboard::class, 'marketplace'])->name('marketplace');
         Route::get('/marketplace/{id}', [UserDashboard::class, 'productDetail'])->name('marketplace.detail');

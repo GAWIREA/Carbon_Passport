@@ -91,7 +91,10 @@
         <div class="card bento-c1" style="background: var(--bg); display: flex; flex-direction: column; justify-content: center; padding: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3 style="font-size: 15px; margin: 0;">Lencana Teratas</h3>
-                <a href="{{ route('user.achievements') }}" style="font-size: 11px; color: var(--primary); text-decoration: none;">Lihat Semua &rarr;</a>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="document.getElementById('editBadgesModal').classList.add('show')" style="font-size: 11px; color: var(--primary); background: none; border: none; cursor: pointer; padding: 0;">Edit</button>
+                    <a href="{{ route('user.achievements') }}" style="font-size: 11px; color: var(--primary); text-decoration: none;">Lihat Semua &rarr;</a>
+                </div>
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -160,6 +163,38 @@
     </div>
 </div>
 
+<!-- Modal Edit Lencana -->
+<div class="modal-overlay" id="editBadgesModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 18px;">Pilih Lencana Dipamerkan</h3>
+            <button onclick="document.getElementById('editBadgesModal').classList.remove('show')" style="font-size: 20px; color: var(--text-light); background: none; border: none; cursor: pointer;">&times;</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-light); margin-bottom: 16px;">Pilih maksimal 5 lencana untuk ditampilkan di profil Anda.</p>
+        <form action="{{ route('user.profile.achievements.update') }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                @if(isset($userAchievements) && $userAchievements->count() > 0)
+                    @foreach($userAchievements as $ua)
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px; border: 1px solid var(--border); border-radius: 8px;">
+                            <input type="checkbox" name="achievements[]" value="{{ $ua->achievement_id }}" class="badge-checkbox" {{ $ua->is_displayed ? 'checked' : '' }} onchange="checkMaxBadges(this)">
+                            <div style="font-size: 24px;">{{ $ua->achievement->icon }}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 14px;">{{ $ua->achievement->name }}</div>
+                                <div style="font-size: 11px; color: var(--text-light);">{{ $ua->achievement->category }}</div>
+                            </div>
+                        </label>
+                    @endforeach
+                @else
+                    <p style="font-size: 13px; color: var(--text-light); text-align: center;">Anda belum memiliki lencana.</p>
+                @endif
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
 <style>
 .modal-overlay.show { display: flex !important; }
 .modal-overlay a:hover { background: var(--bg); }
@@ -173,4 +208,12 @@
             }
         });
     });
+
+    function checkMaxBadges(checkbox) {
+        const checkedBoxes = document.querySelectorAll('.badge-checkbox:checked');
+        if (checkedBoxes.length > 5) {
+            checkbox.checked = false;
+            alert('Maksimal 5 lencana yang dapat dipamerkan.');
+        }
+    }
 </script>
