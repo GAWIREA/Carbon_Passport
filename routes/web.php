@@ -42,6 +42,7 @@ Route::prefix('user')
         Route::get('/u/{id}', [SocialController::class, 'publicProfile'])->name('public.profile');
         Route::post('/u/{id}/follow', [SocialController::class, 'toggleFollow'])->name('follow.toggle');
         Route::get('/settings', [UserDashboard::class, 'settings'])->name('settings');
+        Route::get('/notifications', [UserDashboard::class, 'notifications'])->name('notifications');
         Route::get('/tracking', [UserDashboard::class, 'tracking'])->name('tracking');
         Route::post('/tracking', [UserDashboard::class, 'storeTracking'])->name('tracking.store');
         Route::get('/history', [UserDashboard::class, 'history'])->name('history');

@@ -1,10 +1,20 @@
 <aside class="sidebar">
-  <div class="brand">
-    <div class="brand-logo">🌱</div>
-    <div>
+  <style>
+    .close-sidebar { display: none; }
+    @media(max-width: 900px) {
+      .close-sidebar { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: #f1f5f9; border: none; cursor: pointer; color: #64748b; margin-left: auto; }
+      .close-sidebar:hover { background: #e2e8f0; color: #0f172a; }
+    }
+  </style>
+  <div class="brand" style="display: flex; align-items: center; gap: 12px;">
+    <div class="brand-logo" style="margin: 0;">🌱</div>
+    <div style="flex: 1;">
       <div class="brand-name">EcoTrack</div>
       <div class="brand-tag">Track your daily carbon!</div>
     </div>
+    <button class="close-sidebar" id="closeSidebar" title="Tutup Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
   </div>
 
   @auth

@@ -768,6 +768,11 @@ class DashboardController extends Controller
         return view('user.settings', ['user' => Auth::user()]);
     }
 
+    public function notifications(): View
+    {
+        return view('user.notifications', ['user' => Auth::user()]);
+    }
+
     public function storeTracking(Request $request, CarbonTrackingService $service): RedirectResponse
     {
         $validated = $request->validate([

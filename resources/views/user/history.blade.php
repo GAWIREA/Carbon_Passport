@@ -30,6 +30,50 @@
   </div>
 @endif
 
+<style>
+  .main-tabs {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+  .main-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: all 0.3s ease;
+  }
+  .main-tab.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .tab-content-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+  .tab-slider {
+    display: flex;
+    width: 200%;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  .tab-panel {
+    width: 50%;
+    flex-shrink: 0;
+    padding-bottom: 20px;
+  }
+</style>
+
 {{-- Summary Cards Bulan Ini --}}
 <div class="bento" style="margin-bottom:18px; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px;">
   <div class="card bento-c1">
@@ -57,6 +101,17 @@
     <div class="stat-sub">Total Catatan</div>
   </div>
 </div>
+
+<div class="main-tabs">
+  <button class="main-tab active" id="tab-riwayat" onclick="switchMainTab('riwayat')">📜 Riwayat</button>
+  <button class="main-tab" id="tab-rincian" onclick="switchMainTab('rincian')">📊 Rincian</button>
+</div>
+
+<div class="tab-content-container">
+  <div class="tab-slider" id="tabSlider">
+    
+    <!-- Panel 1: Riwayat -->
+    <div class="tab-panel">
 
 {{-- Tabel Riwayat dengan Filter Kategori --}}
 <div class="card">
@@ -198,10 +253,13 @@
     @endif
   @endif
 </div>
+    </div> <!-- End Panel 1 -->
 
-{{-- Per-Kategori Summary Bulan Ini --}}
-@if($categoryTotals->isNotEmpty())
-<div class="card" style="margin-top:18px;">
+    <!-- Panel 2: Rincian -->
+    <div class="tab-panel">
+      {{-- Per-Kategori Summary Bulan Ini --}}
+      @if($categoryTotals->isNotEmpty())
+      <div class="card">
   <div class="card-title" style="margin-bottom:14px;">📊 Rincian per Kategori — {{ now()->translatedFormat('F Y') }}</div>
   <div style="display:flex; flex-direction:column; gap:10px;">
     @foreach($categoryMeta as $key => $meta)
@@ -233,6 +291,9 @@
   </div>
 </div>
 @endif
+    </div> <!-- End Panel 2 -->
+  </div> <!-- End Tab Slider -->
+</div> <!-- End Tab Content Container -->
 
 @endsection
 
@@ -272,5 +333,21 @@
     row.addEventListener('mouseleave', () => row.style.background = '');
   });
 }());
+
+function switchMainTab(tab) {
+  const slider = document.getElementById('tabSlider');
+  const btnRiwayat = document.getElementById('tab-riwayat');
+  const btnRincian = document.getElementById('tab-rincian');
+
+  if (tab === 'riwayat') {
+    slider.style.transform = 'translateX(0%)';
+    btnRiwayat.classList.add('active');
+    btnRincian.classList.remove('active');
+  } else {
+    slider.style.transform = 'translateX(-50%)';
+    btnRincian.classList.add('active');
+    btnRiwayat.classList.remove('active');
+  }
+}
 </script>
 @endpush

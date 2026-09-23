@@ -38,6 +38,9 @@ function showToast(msg){
 document.getElementById('menuToggle')?.addEventListener('click', ()=>{
   document.querySelector('.sidebar').classList.toggle('open');
 });
+document.getElementById('closeSidebar')?.addEventListener('click', ()=>{
+  document.querySelector('.sidebar').classList.remove('open');
+});
 
 /* Chart.js global defaults */
 if (window.Chart) {

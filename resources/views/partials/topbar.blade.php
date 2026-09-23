@@ -51,7 +51,7 @@
       🛒
     </a>
 
-    <div class="bell">🔔<span class="ping"></span></div>
+    <a href="{{ route('user.notifications') }}" class="bell" style="text-decoration:none;">🔔</a>
     <div class="dropdown">
       <div class="user-chip" id="profileDropdownToggle" style="cursor: pointer;">
         <span>Hi, {{ auth()->user()?->name ?? 'Guest' }}</span>
@@ -73,6 +73,8 @@
             🪙 <span>{{ auth()->check() ? number_format(auth()->user()->coins ?? 0, 0, ',', '.') : 0 }}</span>
           </div>
         </div>
+        <a href="{{ route('user.marketplace') }}" class="dropdown-item">🛒 Keranjang</a>
+        <a href="{{ route('user.notifications') }}" class="dropdown-item">🔔 Notifikasi</a>
         <a href="{{ route('user.profile') }}" class="dropdown-item">👤 Profil</a>
         <a href="{{ route('user.settings') }}" class="dropdown-item">⚙️ Pengaturan</a>
         <div class="dropdown-divider"></div>
