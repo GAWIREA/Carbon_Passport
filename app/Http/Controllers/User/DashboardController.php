@@ -743,7 +743,8 @@ class DashboardController extends Controller
                 'activity_type' => 'Tukar: ' . $product->name,
                 'amount' => 1,
                 'unit' => 'item',
-                'co2_equivalent' => $product->co2_reduction,
+                'co2_equivalent' => $product->co2_reduction, // This is purely for total record, but co2_saved is what defines it as a 'saving'
+                'co2_saved' => $product->co2_reduction,
                 'date' => now()->toDateString(),
             ]);
         }

@@ -22,7 +22,26 @@
             {{ $category }}
         </h2>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+        <style>
+            .achievements-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .ach-desc {
+                display: none;
+            }
+            @media (min-width: 640px) {
+                .achievements-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                    gap: 16px;
+                }
+                .ach-desc {
+                    display: block;
+                }
+            }
+        </style>
+        <div class="achievements-grid">
             @foreach($achievements as $ach)
                 @php
                     $isUnlocked = isset($unlockedAchievements[$ach->id]);
@@ -40,38 +59,34 @@
                     $borderColor = $isUnlocked ? '#FFD54F' : 'var(--border)';
                 @endphp
                 
-                <div class="card" style="padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid {{ $borderColor }}; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; background: {{ $isUnlocked ? '#FFFCF2' : '#FFF' }};">
+                <div class="card" style="padding: 12px 8px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid {{ $borderColor }}; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; background: {{ $isUnlocked ? '#FFFCF2' : '#FFF' }}; border-radius: 12px;">
                     
                     <!-- Icon -->
-                    <div style="width: 72px; height: 72px; background: {{ $badgeBg }}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; filter: {{ $badgeFilter }}; margin-bottom: 12px; transition: transform 0.3s; cursor: default;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width: 48px; height: 48px; background: {{ $badgeBg }}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; filter: {{ $badgeFilter }}; margin-bottom: 8px; transition: transform 0.3s; cursor: default;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                         {{ $ach->icon }}
                     </div>
                     
-                    <h3 style="font-size: 15px; margin: 0 0 6px 0; color: {{ $isUnlocked ? 'var(--text-dark)' : 'var(--text-main)' }}; font-weight: 700;">
+                    <h3 style="font-size: 11px; line-height: 1.3; margin: 0 0 4px 0; color: {{ $isUnlocked ? 'var(--text-dark)' : 'var(--text-main)' }}; font-weight: 700;">
                         {{ $ach->name }}
                     </h3>
                     
-                    <p style="font-size: 11.5px; color: var(--text-light); line-height: 1.4; margin: 0 0 16px 0; min-height: 32px;">
+                    <p class="ach-desc" style="font-size: 10px; color: var(--text-light); line-height: 1.3; margin: 0 0 12px 0;">
                         {{ $ach->description }}
                     </p>
                     
                     @if($isUnlocked)
                         <div style="margin-top: auto; width: 100%;">
-                            <div style="font-size: 12px; font-weight: 600; color: #E67E22; background: #FEF9E7; padding: 4px 0; border-radius: 20px; border: 1px solid #FAD7A1;">
-                                ✨ Diperoleh {{ $unlockedAt }}
+                            <div style="font-size: 9px; font-weight: 700; color: #E67E22; background: #FEF9E7; padding: 4px 2px; border-radius: 6px; border: 1px solid #FAD7A1;">
+                                ✅ Selesai
                             </div>
                         </div>
                     @else
                         <div style="margin-top: auto; width: 100%;">
-                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-light); margin-bottom: 4px;">
-                                <span>Progress</span>
+                            <div style="display: flex; justify-content: center; font-size: 9px; color: var(--text-light); margin-bottom: 4px; font-weight: 600;">
                                 <span>{{ $displayProgress }} / {{ $target }}</span>
                             </div>
-                            <div class="progress-track" style="height: 6px; background: #EEE; border-radius: 10px; overflow: hidden;">
+                            <div class="progress-track" style="height: 4px; background: #EEE; border-radius: 10px; overflow: hidden;">
                                 <div class="progress-fill" style="width: {{ $percent }}%; height: 100%; background: #BDBDBD; border-radius: 10px;"></div>
-                            </div>
-                            <div style="font-size: 10px; color: var(--text-light); margin-top: 6px; font-weight: 500;">
-                                🎁 Hadiah: +{{ $ach->xp_reward }} XP
                             </div>
                         </div>
                     @endif

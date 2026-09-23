@@ -29,8 +29,8 @@
   </div>
 </div>
 
-{{-- Sinkronisasi Otomatis --}}
-<div class="card" style="margin-bottom:18px;">
+{{-- Sinkronisasi Otomatis (Dihide sementara) --}}
+<div class="card" style="margin-bottom:18px; display: none;">
   <div class="card-title" style="margin-bottom:14px;">🔗 Sinkronisasi Otomatis</div>
   @foreach([
     ['icon'=>'🏃','name'=>'Strava','sub'=>'Lacak aktivitas jalan/lari/sepeda otomatis','status'=>false],
@@ -54,7 +54,7 @@
 {{-- Input Manual --}}
 <div class="card">
   <div class="card-title" style="margin-bottom:14px;">✍️ Input Manual</div>
-  <div class="filter-tabs">
+  <div class="filter-tabs" style="display: none;">
     <button class="filter-tab active" data-tab="tab-manual">Input Angka</button>
     <button class="filter-tab" data-tab="tab-scan">Guided AI Scan</button>
   </div>

@@ -186,9 +186,12 @@
 
 <!-- Section: Produk Rekomendasi -->
 <div class="card" style="margin-bottom:24px; padding: 24px;">
-  <div style="font-size: 14px; font-weight: bold; margin-bottom: 12px;">Produk Pendukung
-      <span style="font-size: 12px; font-weight: normal; color: var(--text-light);">(Tukar koinmu dengan produk ini)</span>
-    </div>
+  <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
+    <h2 style="margin-top:0; margin-bottom: 4px; font-size: 18px; color: var(--text-dark); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        🛒 Produk Pendukung
+    </h2>
+    <span style="font-size: 12px; font-weight: normal; color: var(--text-light); margin-bottom: 12px;">(Tukar koinmu dengan berbagai produk menarik ini)</span>
+  </div>
   
   <div class="recList section-list" data-expanded="false" style="display: flex; flex-direction: column; gap: 16px;">
     @foreach($recommendations as $i => $r)
@@ -203,7 +206,7 @@
           <div style="flex-grow: 1; min-width: 150px; display: flex; flex-direction: column; justify-content: center;">
             <h3 style="margin: 0 0 8px 0; font-size: 16px; color: var(--text-dark); line-height: 1.4;">{{ $r['title'] }}</h3>
             
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom: 8px;">
+            <div style="display:flex; align-items:center; justify-content: center; gap:8px; margin-bottom: 8px;" class="product-badges-wrapper">
               <span class="badge badge-grey" style="font-size: 11px;">{{ $r['cat'] }}</span>
             </div>
             
@@ -221,7 +224,7 @@
               <div style="font-size: 11px; color: var(--text-light); margin-top: 4px;">{{ $r['price'] }}</div>
             @endif
             <div style="margin-top: 12px; width: 100%;">
-              <a href="{{ route('user.marketplace.detail', $r['product_id'] ?? 1) }}" class="btn btn-outline btn-sm" style="width: 100%; padding: 8px; border-radius: 20px; font-weight: 600; text-decoration: none; display: block; border-color: #F5A623; color: #F5A623;">Lihat Detail</a>
+              <a href="{{ route('user.marketplace.detail', $r['product_id'] ?? 1) }}" class="btn btn-outline btn-sm mission-cta-btn" style="padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: 11.5px; text-decoration: none; border-color: #F5A623; color: #F5A623;">Lihat Detail</a>
             </div>
           </div>
         </div>

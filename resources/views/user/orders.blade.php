@@ -7,6 +7,7 @@
 @endphp
 
 @section('content')
+
 <div style="margin-bottom: 24px;">
     <a href="{{ route('user.marketplace') }}" style="text-decoration: none; color: var(--text-light); display: inline-flex; align-items: center; gap: 8px;">
         ← Kembali ke Marketplace
@@ -28,38 +29,58 @@
     <a href="{{ route('user.marketplace') }}" class="btn btn-primary">Lihat Marketplace</a>
 </div>
 @else
-<div style="display: flex; flex-direction: column; gap: 16px;">
+<style>
+    .order-list-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    @media (max-width: 640px) {
+        .order-list-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="order-list-grid">
     @foreach($orders as $order)
-    <div class="card" style="padding: 20px; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
-        <div style="display: flex; flex-direction: row; gap: 16px; align-items: center; flex: 1; min-width: 250px;">
-            <div style="width: 48px; height: 48px; background: #F8F9FA; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                @if($order->product && $order->product->name === 'Streak Pemulihan')
-                    🔥
-                @elseif($order->product)
-                    🎁
-                @else
-                    📦
+    <div class="card" style="padding: 16px; display: flex; flex-direction: row; align-items: center; gap: 16px;">
+        {{-- Ikon --}}
+        <div style="width: 48px; height: 48px; background: #F8F9FA; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
+            @if($order->product && $order->product->name === 'Streak Pemulihan')
+                🔥
+            @elseif($order->product)
+                🎁
+            @else
+                📦
+            @endif
+        </div>
+        
+        {{-- Teks 3 Baris --}}
+        <div style="flex: 1; min-width: 0;">
+            <h4 style="margin: 0 0 4px 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $order->product ? $order->product->name : 'Produk Tidak Diketahui' }}</h4>
+            
+            <div style="font-size: 11px; color: var(--text-light); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 4px;">
+                <span>{{ $order->created_at->translatedFormat('d M Y') }}</span>
+                @if($order->product && $order->product->co2_reduction > 0)
+                    <span style="color: #2E7D32; font-weight: 600;">🌿 -{{ $order->product->co2_reduction }} kg CO2</span>
                 @endif
             </div>
-            <div>
-                <h4 style="margin: 0 0 4px 0; font-size: 16px;">{{ $order->product ? $order->product->name : 'Produk Tidak Diketahui' }}</h4>
-                <div style="font-size: 12px; color: var(--text-light); display: flex; gap: 12px; align-items: center;">
-                    <span>{{ $order->created_at->translatedFormat('d M Y, H:i') }}</span>
-                    @if($order->product && $order->product->co2_reduction > 0)
-                        <span style="color: #2E7D32; font-weight: 600;">🌿 -{{ $order->product->co2_reduction }} kg CO2</span>
-                    @endif
-                </div>
+            
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
+                @if($order->payment_method === 'coins')
+                    <span style="font-weight: bold; color: #F5A623;">🪙 {{ number_format($order->total_coins, 0, ',', '.') }}</span>
+                @else
+                    <span style="font-weight: bold; color: #2ECC71;">Rp {{ number_format($order->total_idr, 0, ',', '.') }}</span>
+                @endif
+                <span style="color: var(--text-light); font-size: 11px;">• {{ ucfirst($order->status) }}</span>
             </div>
         </div>
         
-        <div style="display: flex; align-items: center; gap: 16px;">
-            <div style="text-align: right;">
-                @if($order->payment_method === 'coins')
-                    <div style="font-weight: bold; color: #F5A623;">🪙 {{ number_format($order->total_coins, 0, ',', '.') }}</div>
-                @else
-                    <div style="font-weight: bold; color: #2ECC71;">Rp {{ number_format($order->total_idr, 0, ',', '.') }}</div>
-                @endif
-                <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">{{ ucfirst($order->status) }}</div>
+        {{-- Badge Kanan --}}
+        <div style="flex-shrink: 0;">
+            <div style="width: 32px; height: 32px; background: #E8F5E9; color: #2E7D32; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(46,125,50,0.1);">
+                ✓
             </div>
         </div>
     </div>

@@ -36,6 +36,19 @@ class AchievementService
                 if ($achievement->xp_reward > 0) {
                     $user->xp += $achievement->xp_reward;
                     $user->save();
+
+                    CarbonLog::create([
+                        'user_id' => $user->id,
+                        'category' => 'Pencapaian',
+                        'activity_type' => 'Unlock: ' . $achievement->title,
+                        'amount' => 1,
+                        'unit' => 'badge',
+                        'co2_equivalent' => 0,
+                        'co2_saved' => 0,
+                        'xp_earned' => $achievement->xp_reward,
+                        'points_earned' => 0,
+                        'date' => now()->toDateString(),
+                    ]);
                 }
 
                 $unlocked[] = [

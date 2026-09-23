@@ -18,7 +18,7 @@
   </div>
 
   @auth
-    <div class="role-switcher">
+    <div class="role-switcher" style="display: none;">
       <div class="role-switcher-label">Role Aktif</div>
       <div class="role-btn active" style="cursor:default; justify-content:center;">
         @if(auth()->user()->isAdmin())
